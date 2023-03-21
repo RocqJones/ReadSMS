@@ -2,4 +2,5 @@
     <string name="app_name">Read SMS</string>
     <string name="read_last_mpesa_message">Read Last MPESA Message</string>
     <string name="show_sms_here">Show sms here!</string>
+    <string name="show_mpesa_code">Show Mpesa code</string>
 </resources>
