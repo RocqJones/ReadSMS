@@ -3,10 +3,14 @@ package com.rocqjones.readsms
 import android.content.Context
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.telephony.SmsMessage
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -105,10 +109,48 @@ class MainActivity : AppCompatActivity() {
                 binding.mPesaMessage.text = message
 
                 if (message.length > 5) {
-                    val index = message.indexOf("Confirmed.")  // find the index of "Confirmed."
+                    val index = message.indexOf("Confirmed.") // find the index of "Confirmed."
+                    Log.d("output", "Index: $index")
                     val result = message.substring(0, index)  // extract the text before "Confirmed."
+                    Log.d("output", "Result: $result")
                     binding.mPesaCode.text = "CODE: $result"
                     Toast.makeText(this, "CODE: $result", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+}
+
+/**
+ * Handle incoming SMS with BroadcastReceiver if needed
+ */
+class SmsReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context?, intent: Intent?) {
+        try {
+            if (intent?.action == "android.provider.Telephony.SMS_RECEIVED") {
+                val bundle = intent.extras
+                if (bundle != null) {
+                    val pdus = bundle["pdus"] as Array<Any>
+                    for (pdu in pdus) {
+                        val smsMessage = SmsMessage.createFromPdu(pdu as ByteArray)
+                        val messageBody = smsMessage.messageBody
+                        val messageSender = smsMessage.originatingAddress
+
+                        // Check if the message is from the expected sender
+                        if (messageSender == "MPESA") {
+                            // Perform actions with the message here
+
+                            // Store the state of the message using SharedPreferences
+                            val preferences = context?.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                            val editor = preferences?.edit()
+                            editor?.putBoolean("messageReceived", true)
+                            editor?.apply()
+
+                            Log.d("SmsReceiver", " messageReceived Successfully")
+                        }
+                    }
                 }
             }
         } catch (e: Exception) {
