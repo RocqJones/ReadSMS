@@ -2,6 +2,7 @@ package com.rocqjones.readsms
 
 import android.content.Context
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -97,6 +98,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showMessageToUI(message: String) {
         try {
             if (message.isNotEmpty()) {
@@ -105,7 +107,7 @@ class MainActivity : AppCompatActivity() {
                 if (message.length > 5) {
                     val index = message.indexOf("Confirmed.")  // find the index of "Confirmed."
                     val result = message.substring(0, index)  // extract the text before "Confirmed."
-                    binding.mPesaCode.text = result
+                    binding.mPesaCode.text = "CODE: $result"
                     Toast.makeText(this, "CODE: $result", Toast.LENGTH_SHORT).show()
                 }
             }
